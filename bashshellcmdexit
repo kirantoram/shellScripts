@@ -1,0 +1,23 @@
+
+for i in {1..10}; do echo $i >> outfile; sleep 5; done
+
+
+$ shopt -s huponexit; shopt | grep huponexit
+huponexit       on
+# Background jobs will be terminated with SIGHUP when shell exits
+
+$ shopt -u huponexit; shopt | grep huponexit
+huponexit       off
+# Background jobs will NOT be terminated with SIGHUP when shell exits
+
+Using the ampersand (&) will run the command in a child process (child to the current bash session). However, when you exit the session, all child processes will be killed.
+
+using nohup + ampersand (&) will do the same thing, except that when the session ends, the parent of the child process will be changed to "1" which is the "init" process, thus preserving the child from being killed.
+
+
+$ ssh user@host “nohup bash testscript.sh &”
+You won’t get a prompt returned here until the remote task finishes because SSH won’t drop the connection when I/O streams are open.
+
+
+$ ssh -n user@host “nohup bash testscript.sh & > /dev/null &2>1 &”
+This will immediately return your prompt.
